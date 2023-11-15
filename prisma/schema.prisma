@@ -1,20 +1,38 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-generator client {
-    provider = "prisma-client-js"
+datasource db {
+  provider = "mysql"
+  url      = ur url 
+  relationMode = "prisma"
 }
 
-datasource db {
-    provider = "sqlite"
-    url      = env("DATABASE_URL")
+
+generator client {
+  provider = "prisma-client-js"
 }
+
 
 model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    id         String   @id @default(cuid())
+    created_at DateTime @default(now())
 
-    @@index([name])
+    content    String @db.VarChar(255)
+    authorId   String
+
+    @@index([authorId])
+}
+
+model Activity {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  hostUsername String
+  location     String 
+  exactEndDate DateTime 
+  description  String   @db.VarChar(500)
+  vibe         String
+  
+
+  @@unique([hostUsername])
+
 }
