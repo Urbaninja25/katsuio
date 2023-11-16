@@ -2,31 +2,41 @@ import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-// export const postRouter = createTRPCRouter({
-//   hello: publicProcedure
-//     .input(z.object({ text: z.string() }))
-//     .query(({ input }) => {
-//       return {
-//         greeting: `Hello ${input.text}`,
-//       };
-//     }),
+export const postRouter = createTRPCRouter({
+  getAll: publicProcedure.query(async ({ ctx }) => {
+    await ctx.db.post.findMany({
+      take: 100,
+      orderBy: {
+        created_at: "desc",
+      },
+    });
+  }),
 
-//   create: publicProcedure
-//     .input(z.object({ name: z.string().min(1) }))
-//     .mutation(async ({ ctx, input }) => {
-//       // simulate a slow db call
-//       await new Promise((resolve) => setTimeout(resolve, 1000));
+  create: publicProcedure
+    .input(
+      z.object({
+        question: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      // const { success } = await ratelimit.limit(authorId);
+      // if (!success) {
+      //   throw new TRPCError({
+      //     code: "TOO_MANY_REQUESTS",
+      //   });
+      // }
 
-//       return ctx.db.post.create({
-//         data: {
-//           name: input.name,
-//         },
-//       });
-//     }),
+      const post = await ctx.db.post.create({
+        data: {
+          question: input.question,
+        },
+      });
+      return post;
+    }),
 
-//   getLatest: publicProcedure.query(({ ctx }) => {
-//     return ctx.db.post.findFirst({
-//       orderBy: { createdAt: "desc" },
-//     });
-//   }),
-// });
+  // getLatest: publicProcedure.query(({ ctx }) => {
+  //   return ctx.db.post.findFirst({
+  //     orderBy: { createdAt: "desc" },
+  //   });
+  // }),
+});
