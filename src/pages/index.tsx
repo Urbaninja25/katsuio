@@ -41,6 +41,7 @@ const CreateRequestWizard = () => {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={async (e) => {
               if (e.key === "Enter") {
+                setInput("");
                 setIsLoading(true);
                 e.preventDefault();
                 if (input !== "") {
@@ -60,6 +61,7 @@ const CreateRequestWizard = () => {
           onClick={async () => {
             setIsLoading(true);
             try {
+              setInput("");
               const fetchedData = await callChatGPTWithAssistance(input);
               setData(fetchedData); // Set the retrieved data in the state
             } catch {

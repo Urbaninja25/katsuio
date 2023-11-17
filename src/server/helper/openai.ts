@@ -37,15 +37,19 @@ async function callChatGPTWithAssistance(input: string) {
       );
       if (runStatus.status === "completed") {
         const messages = await openai.beta.threads.messages.list(threadId);
-        const conversation = messages.data.map((msg) => {
+        let conversation = "";
+
+        messages.data.forEach((msg) => {
           const role = msg.role;
           const content = msg.content[0].text.value;
 
-          return `👾 katsuio ${
-            role.charAt(0).toUpperCase() + role.slice(1)
-          }: ${content}`;
+          if (role !== "user") {
+            conversation += `${content}\n`;
+          }
         });
-        return conversation.join("\n");
+
+        console.log(conversation.trim());
+        return conversation.trim();
       } else {
         throw new Error("Run is not completed yet.");
       }
