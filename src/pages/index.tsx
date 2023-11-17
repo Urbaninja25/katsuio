@@ -13,45 +13,58 @@ import {
 import { PageLayout } from "~/componenets/layout";
 import { LoadingPage, LoadingSpinner } from "~/componenets/loading";
 
-// dotenv.config({ path: "./config.env" });
-
-console.log(process.env.NEXT_PUBLIC_OPEN_AI_API_KEY);
-
 const CreateRequestWizard = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null); // State to hold the retrieved data
 
   return (
-    <div className="flex w-full  gap-3 ">
-      <input
-        placeholder="Type something!"
-        className="mb-2 grow bg-transparent text-lg font-semibold outline-none"
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={async (e) => {
-          if (e.key === "Enter") {
-            setIsLoading(true);
-            e.preventDefault();
-            if (input !== "") {
-              const fetchedData = await callChatGPTWithAssistance(input);
-              setData(fetchedData); // Set the retrieved data in the state
-            }
-
-            setIsLoading(false);
-          }
-        }}
-        disabled={isLoading}
-      />
+    <div>
+      <label
+        htmlFor="question for assistance api"
+        className="block text-sm font-medium leading-6 text-gray-900"
+      >
+        find your unique experiancies
+      </label>
+      <div className="relative mt-2 rounded-md shadow-sm">
+        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+          <span className="text-gray-500 sm:text-sm">🤖</span>
+        </div>
+        <div className="flex w-full items-center justify-between gap-3">
+          <input
+            type="text"
+            name="question"
+            className="block w-full rounded-md border-0 py-1.5 pl-7 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-800 sm:text-sm sm:leading-6"
+            placeholder="What can I explore today?"
+            disabled={isLoading}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={async (e) => {
+              if (e.key === "Enter") {
+                setIsLoading(true);
+                e.preventDefault();
+                if (input !== "") {
+                  const fetchedData = await callChatGPTWithAssistance(input);
+                  setData(fetchedData); // Set the retrieved data in the state
+                }
+                setIsLoading(false);
+              }
+            }}
+          />
+        </div>
+      </div>
 
       {input !== "" && !isLoading && (
         <button
-          className="focus:shadow-outline m-2 mr-10 h-10 rounded-lg bg-gray-700 px-5 text-gray-100 transition-colors duration-150 hover:bg-gray-800"
+          className="focus:shadow-outline h-10 rounded-lg bg-purple-600 px-5 text-violet-200 transition-colors duration-150 hover:bg-gray-800"
           onClick={async () => {
             setIsLoading(true);
-            const fetchedData = await callChatGPTWithAssistance(input);
-            setData(fetchedData); // Set the retrieved data in the state
+            try {
+              const fetchedData = await callChatGPTWithAssistance(input);
+              setData(fetchedData); // Set the retrieved data in the state
+            } catch {
+              console.error("Error fetching data:", Error);
+            }
             setIsLoading(false);
           }}
         >
@@ -60,7 +73,7 @@ const CreateRequestWizard = () => {
       )}
 
       {isLoading && (
-        <div className="mr-10 flex items-center justify-center">
+        <div className="flex items-center">
           <LoadingSpinner size={20} />
         </div>
       )}
@@ -68,13 +81,14 @@ const CreateRequestWizard = () => {
       {/* Display data if available */}
       {data && !isLoading && (
         <div className="mt-4">
-          <p>Data: {data}</p>
+          <div className="rounded-lg bg-gray-200 p-4">
+            <p className="text-sm text-gray-700">{data}</p>
+          </div>
         </div>
       )}
     </div>
   );
 };
-
 const Home: NextPage = () => {
   return (
     <PageLayout>
@@ -88,14 +102,11 @@ const Home: NextPage = () => {
 
       <main className="bg-gray-100 p-4">
         <div className="mx-auto max-w-md">
-          <h1 className="mb-2 text-lg font-semibold">Ask a Question</h1>
+          <h1 className="mb-2 text-lg font-semibold">
+            KatsuioAI is on her way to help!💜
+          </h1>
 
           <CreateRequestWizard />
-
-          <div className="rounded-md border border-gray-300 bg-white p-4 shadow-md">
-            <h2 className="mb-2 text-lg font-semibold">Response</h2>
-            <div id="responseDisplay" className="text-gray-600"></div>
-          </div>
         </div>
       </main>
     </PageLayout>

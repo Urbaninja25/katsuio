@@ -1,7 +1,6 @@
 import openAI from "openai";
 import { api } from "~/utils/api";
 import fs from "fs";
-import * as dotenv from "dotenv";
 
 // dotenv.config({ path: "./config.env" });
 
@@ -12,28 +11,63 @@ const openai = new openAI({
 //openai assistanse//
 ///////////////////////////////////
 async function callChatGPTWithAssistance(input: string) {
-  const assistant = await openai.beta.assistants.retrieve(
-    "asst_OlVooj16vJ74tjhmCkjssxop",
-  );
+  try {
+    const assistant = await openai.beta.assistants.retrieve(
+      "asst_OlVooj16vJ74tjhmCkjssxop",
+    );
 
-  const thread = await openai.beta.threads.create();
+    const thread = await openai.beta.threads.create();
 
-  const message = await openai.beta.threads.messages.create(thread.id, {
-    role: "user",
-    content: input,
-  });
+    const message = await openai.beta.threads.messages.create(thread.id, {
+      role: "user",
+      content: input,
+    });
 
-  const run = await openai.beta.threads.runs.create(thread.id, {
-    assistant_id: assistant.id,
-  });
-  const runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+    const run = await openai.beta.threads.runs.create(thread.id, {
+      assistant_id: assistant.id,
+    });
 
-  const messages = await openai.beta.threads.messages.list(thread.id);
+    const checkStatusAndPrintMessages = async (
+      threadId: string,
+      runId: string,
+    ) => {
+      const runStatus = await openai.beta.threads.runs.retrieve(
+        threadId,
+        runId,
+      );
+      if (runStatus.status === "completed") {
+        const messages = await openai.beta.threads.messages.list(threadId);
+        const conversation = messages.data.map((msg) => {
+          const role = msg.role;
+          const content = msg.content[0].text.value;
 
-  return messages.body.data.array.forEach((message) => {
-    console.log(message.content);
-  });
+          return `👾 katsuio ${
+            role.charAt(0).toUpperCase() + role.slice(1)
+          }: ${content}`;
+        });
+        return conversation.join("\n");
+      } else {
+        throw new Error("Run is not completed yet.");
+      }
+    };
+
+    const conversation = await new Promise<string>((resolve, reject) => {
+      setTimeout(async () => {
+        try {
+          const result = await checkStatusAndPrintMessages(thread.id, run.id);
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        }
+      }, 30000);
+    });
+
+    return conversation;
+  } catch (error) {
+    throw new Error(`Error in chat function: ${error}`);
+  }
 }
+
 //openai functions//
 ////////////////////////////////////////////
 
