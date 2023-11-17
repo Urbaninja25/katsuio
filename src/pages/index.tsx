@@ -5,21 +5,22 @@ import { type NextPage } from "next";
 
 import { api } from "~/utils/api";
 
+import {
+  callChatGPTWithFunctions,
+  callChatGPTWithAssistance,
+} from "~/server/helper/openai";
+
 import { PageLayout } from "~/componenets/layout";
 import { LoadingPage, LoadingSpinner } from "~/componenets/loading";
 
+// dotenv.config({ path: "./config.env" });
+
+console.log(process.env.NEXT_PUBLIC_OPEN_AI_API_KEY);
+
 const CreateRequestWizard = () => {
   const [input, setInput] = useState("");
-
-  const ctx = api.useUtils();
-
-  const { mutate, isLoading: isPosting } = api.post.create.useMutation({
-    onSuccess: () => {
-      setInput("");
-
-      void ctx.post.getAll.invalidate();
-    },
-  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState(null); // State to hold the retrieved data
 
   return (
     <div className="flex w-full  gap-3 ">
@@ -29,28 +30,45 @@ const CreateRequestWizard = () => {
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        onKeyDown={(e) => {
+        onKeyDown={async (e) => {
           if (e.key === "Enter") {
+            setIsLoading(true);
             e.preventDefault();
             if (input !== "") {
-              mutate({ question: input });
+              const fetchedData = await callChatGPTWithAssistance(input);
+              setData(fetchedData); // Set the retrieved data in the state
             }
+
+            setIsLoading(false);
           }
         }}
-        disabled={isPosting}
+        disabled={isLoading}
       />
 
-      {input !== "" && !isPosting && (
+      {input !== "" && !isLoading && (
         <button
           className="focus:shadow-outline m-2 mr-10 h-10 rounded-lg bg-gray-700 px-5 text-gray-100 transition-colors duration-150 hover:bg-gray-800"
-          onClick={() => mutate({ question: input })}
+          onClick={async () => {
+            setIsLoading(true);
+            const fetchedData = await callChatGPTWithAssistance(input);
+            setData(fetchedData); // Set the retrieved data in the state
+            setIsLoading(false);
+          }}
         >
           post
         </button>
       )}
-      {isPosting && (
+
+      {isLoading && (
         <div className="mr-10 flex items-center justify-center">
           <LoadingSpinner size={20} />
+        </div>
+      )}
+
+      {/* Display data if available */}
+      {data && !isLoading && (
+        <div className="mt-4">
+          <p>Data: {data}</p>
         </div>
       )}
     </div>

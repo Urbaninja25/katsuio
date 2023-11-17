@@ -1,0 +1,55 @@
+-----------------------------------------------------------------------------------
+activity id :clp00v50m0000qwv53t0f8tkl
+createdAT :2023-11-15T17:14:17.255Z
+hostUsername :Neli Giorgobiani
+location:41.707222, 44.805000
+exactEndDate:2023-12-29T18:00:00.000Z
+description:Hike to the top of Mtatsminda Mountain for stunning views of Tbilisi. The hike is about 2 kilometers long and takes about an hour to complete. Once you reach the top, you can visit the Mtatsminda Pantheon, a monument to famous Georgians.
+vibe:Active, outdoorsy
+
+-----------------------------------------------------------------------------------
+activity id :clp0102mh0000f7ij2z0bjlty
+createdAT :2023-11-15T17:18:07.433Z
+hostUsername :Giorgi Amashukeli
+location:41.763333, 44.785833
+exactEndDate:2023-12-08T15:00:00.000Z
+description:Explore the Tbilisi Open Air Museum, which houses a collection of traditional Georgian houses and other artifacts. The museum is located on a hilltop overlooking Lisi Lake, so you can enjoy beautiful views while you learn about Georgian history and culture.
+vibe:Cultural, educational
+
+-----------------------------------------------------------------------------------
+activity id :clp0125ow0001f7ijwsyaividv
+createdAT :2023-11-15T17:19:44.721Z
+hostUsername :Mariam Menabde
+location:41.693889, 44.806389
+exactEndDate:2023-12-24T10:00:00.000Z
+description:Take a walking tour of Old Tbilisi, the historic center of the city. On the tour, you will see landmarks such as the Narikala Fortress, the Sioni Cathedral, and the Metekhi Church. You will also learn about the history of Tbilisi and its culture
+vibe:Cultural, historical
+
+-----------------------------------------------------------------------------------
+activity id :clp01djdb0002f7iji4be969m
+createdAT :2023-11-15T17:28:35.663Z
+hostUsername :Guguli Magradze
+location:41.7235455,44.7883367
+exactEndDate:2023-12-27T18:00:00.000Z
+description: Explore Tbilisi's pulsating nightlife and discover the city's hidden gems. From trendy bars and rooftop lounges to underground clubs and live music venues, Tbilisi offers a diverse range of nightlife experiences to suit every taste. Immerse yourself in the city's lively atmosphere and enjoy a night out to remember.
+vibe:Energetic, social, diverse
+
+-----------------------------------------------------------------------------------
+activity id :clp01fkya0003f7ijus62etz1
+createdAT :2023-11-15T17:30:11.027Z
+hostUsername :Irakli Kobakhidze
+location:41.6927092,44.7954976
+exactEndDate:2023-12-25T18:00:00.000Z
+description:Embark on a culinary adventure through Tbilisi's diverse and delicious food scene. Sample traditional Georgian dishes, indulge in international cuisine, and savor the flavors of authentic street food. Discover hidden gems, meet local food enthusiasts, and immerse yourself in the rich culinary heritage of Georgia.
+vibe:Flavorful, adventurous, social
+
+-----------------------------------------------------------------------------------
+activity id :clp01i7si0004f7ijcboc5jbo
+createdAT :2023-11-15T17:32:13.939Z
+hostUsername :Irakli Gharibashvili
+location:41.6980591,44.7972939
+exactEndDate:2023-12-21T18:00:00.000Z
+description:Enjoy a unique movie-watching experience under the stars at one of Tbilisi's open-air cinema venues. Settle into a cozy spot, surrounded by the city's charming ambiance, and immerse yourself in the captivating world of cinema. From classic films to contemporary blockbusters, there's something for every taste and preference.
+vibe:Relaxing, cinematic, atmospheric
+
+-----------------------------------------------------------------------------------

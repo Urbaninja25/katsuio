@@ -1,10 +1,41 @@
 import openAI from "openai";
 import { api } from "~/utils/api";
+import fs from "fs";
+import * as dotenv from "dotenv";
+
+// dotenv.config({ path: "./config.env" });
 
 const openai = new openAI({
-  organization: process.env.OPEN_AI_ORGANIZATION_ID,
-  apiKey: process.env.OPEN_AI_API_KEY,
+  apiKey: process.env.NEXT_PUBLIC_OPEN_AI_API_KEY,
+  dangerouslyAllowBrowser: true,
 });
+//openai assistanse//
+///////////////////////////////////
+async function callChatGPTWithAssistance(input: string) {
+  const assistant = await openai.beta.assistants.retrieve(
+    "asst_OlVooj16vJ74tjhmCkjssxop",
+  );
+
+  const thread = await openai.beta.threads.create();
+
+  const message = await openai.beta.threads.messages.create(thread.id, {
+    role: "user",
+    content: input,
+  });
+
+  const run = await openai.beta.threads.runs.create(thread.id, {
+    assistant_id: assistant.id,
+  });
+  const runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+
+  const messages = await openai.beta.threads.messages.list(thread.id);
+
+  return messages.body.data.array.forEach((message) => {
+    console.log(message.content);
+  });
+}
+//openai functions//
+////////////////////////////////////////////
 
 //  DEFINE OUR HELLO WORLD  FUNCTION
 const getAllActivities = () => {
@@ -15,7 +46,7 @@ const getAllActivities = () => {
 };
 
 //DEFINE OUR GPT FUNTION
-async function callChatGPTWithFunctions(question: string) {
+async function callChatGPTWithFunctions(input: string) {
   const messages = [
     {
       role: "system",
@@ -24,7 +55,7 @@ async function callChatGPTWithFunctions(question: string) {
 
     {
       role: "user",
-      content: question,
+      content: input,
     },
   ];
 
@@ -90,5 +121,4 @@ async function callChatGPTWithFunctions(question: string) {
   console.log(step4finalresponse?.choices?.[0]?.message.content);
 }
 
-//აქ hardcode ვეუბნებით რო ესაა ის ტრინგი ძმაო რომელიც უნდა ჩასვაო
-void callChatGPTWithFunctions();
+export { callChatGPTWithFunctions, callChatGPTWithAssistance };
