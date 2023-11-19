@@ -1,5 +1,6 @@
 import Head from "next/head";
 import { useState } from "react";
+import { useUser, SignInButton, UserButton } from "@clerk/nextjs";
 
 import { type NextPage } from "next";
 
@@ -92,6 +93,8 @@ const CreateRequestWizard = () => {
   );
 };
 const Home: NextPage = () => {
+  const { isLoaded: userLoaded, isSignedIn } = useUser();
+  if (!userLoaded) return <div />;
   return (
     <PageLayout>
       <Head>
@@ -102,13 +105,19 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="bg-gray-100 p-4">
+      <main className="flex bg-gray-100 p-4">
+        {isSignedIn && <UserButton afterSignOutUrl="/" />}
+
         <div className="mx-auto max-w-md">
           <h1 className="mb-2 text-lg font-semibold">
             KatsuioAI is on her way to help!💜
           </h1>
-
-          <CreateRequestWizard />
+          {isSignedIn && <CreateRequestWizard />}
+          {!isSignedIn && (
+            <div className="flex justify-center">
+              <SignInButton className="focus:shadow-outline h-10 rounded-lg bg-purple-600 px-5 text-violet-200 transition-colors duration-150 hover:bg-gray-800" />
+            </div>
+          )}
         </div>
       </main>
     </PageLayout>
