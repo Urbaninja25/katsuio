@@ -25,7 +25,7 @@ const CreateRequestWizard = () => {
         htmlFor="question for assistance api"
         className="block text-sm font-medium leading-6 text-gray-900"
       >
-        find your unique experiancies
+        here u will find your unique experiancies
       </label>
       <div className="relative mt-2 rounded-md shadow-sm">
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -58,7 +58,7 @@ const CreateRequestWizard = () => {
 
       {input !== "" && !isLoading && (
         <button
-          className="focus:shadow-outline h-10 rounded-lg bg-purple-600 px-5 text-violet-200 transition-colors duration-150 hover:bg-gray-800"
+          className="focus:shadow-outline mt-6 h-10 rounded-lg bg-purple-600 px-5 text-violet-200 transition-colors duration-150 hover:bg-gray-800"
           onClick={async () => {
             setIsLoading(true);
             try {
@@ -86,6 +86,9 @@ const CreateRequestWizard = () => {
         <div className="mt-4">
           <div className="rounded-lg bg-gray-200 p-4">
             <p className="text-sm text-gray-700">{data}</p>
+            <button className=" focus:shadow-outline mt-6 h-10 rounded-lg bg-purple-600 px-5 text-violet-200 transition-colors duration-150 hover:bg-gray-800">
+              order
+            </button>
           </div>
         </div>
       )}
