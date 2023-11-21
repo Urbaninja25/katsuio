@@ -4,6 +4,8 @@ import { useUser, SignInButton, UserButton } from "@clerk/nextjs";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { type NextPage } from "next";
+import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
+import { Textarea } from "@nextui-org/react";
 
 import { api } from "~/utils/api";
 
@@ -20,67 +22,108 @@ const CreateRequestPostWizard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null);
   return (
-    <div className="flex w-full flex-nowrap gap-4 md:flex-nowrap">
-      <Input
-        type="text"
-        label=" find your unique experiancies"
-        placeholder="🧙 hey katsuio,what can i expore today?"
-        disabled={isLoading}
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={async (e) => {
-          if (e.key === "Enter") {
-            setIsLoading(true);
-            e.preventDefault();
-            if (input !== "") {
-              const fetchedData = await callChatGPTWithAssistance(input);
-              setData(fetchedData); // Set the retrieved data in the state
-            }
-            setInput("");
-            setIsLoading(false);
-          }
-        }}
-      />
-
-      {input !== "" && (
-        <div>
-          <Button
-            isLoading={isLoading}
-            size="sm"
-            color="secondary"
-            variant="shadow"
-            onClick={async () => {
-              try {
-                setIsLoading(true);
-
+    <div className="w-full flex-col flex-nowrap gap-4 md:flex-nowrap">
+      <div className="w-full  flex-nowrap gap-4 md:flex-nowrap">
+        <Input
+          type="text"
+          label=" find your unique experiancies"
+          placeholder="🧙 hey katsuio,what can i expore today?"
+          disabled={isLoading}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={async (e) => {
+            if (e.key === "Enter") {
+              setIsLoading(true);
+              e.preventDefault();
+              if (input !== "") {
                 const fetchedData = await callChatGPTWithAssistance(input);
                 setData(fetchedData); // Set the retrieved data in the state
-              } catch {
-                console.error("Error fetching data:", Error);
-              } finally {
-                setIsLoading(false); // Ensure isLoading is set to false after operation completes
-                setInput("");
               }
-            }}
-          >
-            Post
-          </Button>
+              setInput("");
+              setIsLoading(false);
+            }
+          }}
+        />
+
+        {input !== "" && (
+          <div>
+            <Button
+              isLoading={isLoading}
+              size="sm"
+              color="secondary"
+              variant="shadow"
+              onClick={async () => {
+                try {
+                  setIsLoading(true);
+
+                  const fetchedData = await callChatGPTWithAssistance(input);
+                  setData(fetchedData); // Set the retrieved data in the state
+                } catch {
+                  console.error("Error fetching data:", Error);
+                } finally {
+                  setIsLoading(false); // Ensure isLoading is set to false after operation completes
+                  setInput("");
+                }
+              }}
+            >
+              Post
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {data && !isLoading && (
+        <div>
+          <CreateResponsePostWizard data={data} />{" "}
         </div>
       )}
-      {data && !isLoading && <CreateResponsePostWizard data={data} />}
     </div>
   );
 };
 
 const CreateResponsePostWizard = ({ data }) => {
   return (
-    <div className="mt-4">
-      <div className="rounded-lg bg-gray-200 p-4">
-        <p className="text-sm text-gray-700">{data}</p>
-        <button className=" focus:shadow-outline mt-6 h-10 rounded-lg bg-purple-600 px-5 text-violet-200 transition-colors duration-150 hover:bg-gray-800">
-          order
-        </button>
+    <div className="flex w-full flex-col p-4">
+      <div>
+        <Textarea
+          isDisabled
+          label="your beez"
+          labelPlacement="outside"
+          placeholder="enter your question"
+          defaultValue={data}
+          className="w-full"
+        />
       </div>
+      <Tabs aria-label="Options">
+        <Tab key="photos" title="Photos">
+          <Card>
+            <CardBody>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.
+            </CardBody>
+          </Card>
+        </Tab>
+        <Tab key="music" title="Music">
+          <Card>
+            <CardBody>
+              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+              reprehenderit in voluptate velit esse cillum dolore eu fugiat
+              nulla pariatur.
+            </CardBody>
+          </Card>
+        </Tab>
+        <Tab key="videos" title="Videos">
+          <Card>
+            <CardBody>
+              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
+              officia deserunt mollit anim id est laborum.
+            </CardBody>
+          </Card>
+        </Tab>
+      </Tabs>
     </div>
   );
 };
