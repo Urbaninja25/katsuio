@@ -63,7 +63,7 @@ async function callChatGPTWithAssistance(input: string) {
         } catch (error) {
           reject(error);
         }
-      }, 30000);
+      }, 60000);
     });
 
     return conversation;
@@ -75,16 +75,22 @@ async function callChatGPTWithAssistance(input: string) {
 //openai functions//
 ////////////////////////////////////////////
 
-//  DEFINE OUR HELLO WORLD  FUNCTION
-const getAllActivities = () => {
-  const { data } = api.post.getAll.useQuery();
-  if (!data) return console.error("error");
-
-  return data;
+const getActivities = async (userNames) => {
+  try {
+    const { data } = await api.post.getAllByUserNames(userNames);
+    if (!data) {
+      console.error("Error fetching activities");
+      return null;
+    }
+    return data;
+  } catch (error) {
+    console.error("Error fetching activities:", error);
+    return null;
+  }
 };
 
 //DEFINE OUR GPT FUNTION
-async function callChatGPTWithFunctions(input: string) {
+async function callChatGPTWithFunctions() {
   const messages = [
     {
       role: "system",
@@ -93,7 +99,8 @@ async function callChatGPTWithFunctions(input: string) {
 
     {
       role: "user",
-      content: input,
+      content:
+        " Settle into a cozy spot, surrounded by the city's charming ambiance, and immerse yourself in the captivating world of cinema. From classic films to contemporary blockbusters, there's something for every taste and preference. This activity has a relaxing, cinematic, and atmospheric vibe. It is hosted by Irakli Gharibashvili and ends on December 21, 2023.",
     },
   ];
 
@@ -104,17 +111,18 @@ async function callChatGPTWithFunctions(input: string) {
 
     functions: [
       {
-        name: "getAllActivities",
-        description: "print hello world with the string passed to it ",
+        name: "getActivities",
+        description: "call function with proper host username as an  argument ",
         parameters: {
           type: "object",
           properties: {
-            appendString: {
+            userNames: {
               type: "string",
-              decription: "the string to append to the hello world message ",
+              decription:
+                "  host username of  certain activity (e.g here It is hosted by Irakli Gharibashvili ,hostUsername will be Irakli Gharibashvili ) ",
             },
           },
-          required: ["appendString"],
+          required: ["userNames"],
         },
       },
     ],
@@ -130,19 +138,21 @@ async function callChatGPTWithFunctions(input: string) {
     //STAP 3 : USE GPT ARGUMENTS TO CALL UR FUNCTION
     if (
       chatCompletion?.choices?.[0]?.message?.function_call?.name ==
-      "getAllActivities"
+      "getActivities"
     ) {
       // let argumentsObj = JSON.parse(
       //   chatCompletion.choices[0].message.function_call.arguments,
       // );
 
-      content = getAllActivities();
+      content = await getActivities(userNames);
+
+      console.log(content);
 
       messages.push(chatCompletion.choices[0].message);
 
       messages.push({
         role: "function",
-        name: "getAllActivities",
+        name: "getActivities",
 
         content,
       });

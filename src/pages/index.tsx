@@ -21,9 +21,10 @@ const CreateRequestPostWizard = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null);
+  const [Functiondata, setFunctionData] = useState(null);
   return (
     <div className="w-full flex-col flex-nowrap gap-4 md:flex-nowrap">
-      <div className="w-full  flex-nowrap gap-4 md:flex-nowrap">
+      <div className="flex  flex-nowrap gap-4 md:flex-nowrap">
         <Input
           type="text"
           label=" find your unique experiancies"
@@ -36,8 +37,12 @@ const CreateRequestPostWizard = () => {
               setIsLoading(true);
               e.preventDefault();
               if (input !== "") {
-                const fetchedData = await callChatGPTWithAssistance(input);
-                setData(fetchedData); // Set the retrieved data in the state
+                const fetchedDataAssistance =
+                  await callChatGPTWithAssistance(input);
+                const fetchedDataFunctions = await callChatGPTWithFunctions();
+                console.log(fetchedDataFunctions);
+                setData(fetchedDataAssistance);
+                setFunctionData(fetchedDataFunctions);
               }
               setInput("");
               setIsLoading(false);
@@ -56,8 +61,12 @@ const CreateRequestPostWizard = () => {
                 try {
                   setIsLoading(true);
 
-                  const fetchedData = await callChatGPTWithAssistance(input);
-                  setData(fetchedData); // Set the retrieved data in the state
+                  const fetchedDataAssistance =
+                    await callChatGPTWithAssistance(input);
+                  const fetchedDataFunctions = await callChatGPTWithFunctions();
+                  console.log(fetchedDataFunctions);
+                  setData(fetchedDataAssistance);
+                  setFunctionData(fetchedDataFunctions);
                 } catch {
                   console.error("Error fetching data:", Error);
                 } finally {
@@ -74,14 +83,14 @@ const CreateRequestPostWizard = () => {
 
       {data && !isLoading && (
         <div>
-          <CreateResponsePostWizard data={data} />{" "}
+          <CreateResponsePostWizard data={data} Functiondata={Functiondata} />{" "}
         </div>
       )}
     </div>
   );
 };
 
-const CreateResponsePostWizard = ({ data }) => {
+const CreateResponsePostWizard = ({ data, Functiondata }) => {
   return (
     <div className="flex w-full flex-col p-4">
       <div>
