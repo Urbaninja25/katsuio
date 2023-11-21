@@ -1,7 +1,8 @@
 import Head from "next/head";
 import { useState } from "react";
 import { useUser, SignInButton, UserButton } from "@clerk/nextjs";
-
+import { Button } from "@nextui-org/react";
+import { Input } from "@nextui-org/react";
 import { type NextPage } from "next";
 
 import { api } from "~/utils/api";
@@ -14,89 +15,79 @@ import {
 import { PageLayout } from "~/componenets/layout";
 import { LoadingPage, LoadingSpinner } from "~/componenets/loading";
 
-const CreateRequestWizard = () => {
+const CreateRequestPostWizard = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState(null); // State to hold the retrieved data
-
+  const [data, setData] = useState(null);
   return (
-    <div>
-      <label
-        htmlFor="question for assistance api"
-        className="block text-sm font-medium leading-6 text-gray-900"
-      >
-        here u will find your unique experiancies
-      </label>
-      <div className="relative mt-2 rounded-md shadow-sm">
-        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-          <span className="text-gray-500 sm:text-sm">🤖</span>
-        </div>
-        <div className="flex w-full items-center justify-between gap-3">
-          <input
-            type="text"
-            name="question"
-            className="block w-full rounded-md border-0 py-1.5 pl-7 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-800 sm:text-sm sm:leading-6"
-            placeholder="What can I explore today?"
-            disabled={isLoading}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={async (e) => {
-              if (e.key === "Enter") {
-                setInput("");
-                setIsLoading(true);
-                e.preventDefault();
-                if (input !== "") {
-                  const fetchedData = await callChatGPTWithAssistance(input);
-                  setData(fetchedData); // Set the retrieved data in the state
-                }
-                setIsLoading(false);
-              }
-            }}
-          />
-        </div>
-      </div>
-
-      {input !== "" && !isLoading && (
-        <button
-          className="focus:shadow-outline mt-6 h-10 rounded-lg bg-purple-600 px-5 text-violet-200 transition-colors duration-150 hover:bg-gray-800"
-          onClick={async () => {
+    <div className="flex w-full flex-nowrap gap-4 md:flex-nowrap">
+      <Input
+        type="text"
+        label=" find your unique experiancies"
+        placeholder="🧙 hey katsuio,what can i expore today?"
+        disabled={isLoading}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={async (e) => {
+          if (e.key === "Enter") {
             setIsLoading(true);
-            try {
-              setInput("");
+            e.preventDefault();
+            if (input !== "") {
               const fetchedData = await callChatGPTWithAssistance(input);
               setData(fetchedData); // Set the retrieved data in the state
-            } catch {
-              console.error("Error fetching data:", Error);
             }
+            setInput("");
             setIsLoading(false);
-          }}
-        >
-          post
-        </button>
-      )}
+          }
+        }}
+      />
 
-      {isLoading && (
-        <div className="flex items-center">
-          <LoadingSpinner size={20} />
+      {input !== "" && (
+        <div>
+          <Button
+            isLoading={isLoading}
+            size="sm"
+            color="secondary"
+            variant="shadow"
+            onClick={async () => {
+              try {
+                setIsLoading(true);
+
+                const fetchedData = await callChatGPTWithAssistance(input);
+                setData(fetchedData); // Set the retrieved data in the state
+              } catch {
+                console.error("Error fetching data:", Error);
+              } finally {
+                setIsLoading(false); // Ensure isLoading is set to false after operation completes
+                setInput("");
+              }
+            }}
+          >
+            Post
+          </Button>
         </div>
       )}
-
-      {/* Display data if available */}
-      {data && !isLoading && (
-        <div className="mt-4">
-          <div className="rounded-lg bg-gray-200 p-4">
-            <p className="text-sm text-gray-700">{data}</p>
-            <button className=" focus:shadow-outline mt-6 h-10 rounded-lg bg-purple-600 px-5 text-violet-200 transition-colors duration-150 hover:bg-gray-800">
-              order
-            </button>
-          </div>
-        </div>
-      )}
+      {data && !isLoading && <CreateResponsePostWizard data={data} />}
     </div>
   );
 };
+
+const CreateResponsePostWizard = ({ data }) => {
+  return (
+    <div className="mt-4">
+      <div className="rounded-lg bg-gray-200 p-4">
+        <p className="text-sm text-gray-700">{data}</p>
+        <button className=" focus:shadow-outline mt-6 h-10 rounded-lg bg-purple-600 px-5 text-violet-200 transition-colors duration-150 hover:bg-gray-800">
+          order
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const Home: NextPage = () => {
   const { isLoaded: userLoaded, isSignedIn } = useUser();
+
   if (!userLoaded) return <div />;
   return (
     <PageLayout>
@@ -108,23 +99,24 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex bg-gray-100 p-4">
-        {isSignedIn && <UserButton afterSignOutUrl="/" />}
-
-        <div className="mx-auto max-w-md">
-          <h1 className="mb-2 text-lg font-semibold">
-            KatsuioAI is on her way to help!💜
-          </h1>
-          {isSignedIn && <CreateRequestWizard />}
-          {!isSignedIn && (
-            <div className="flex justify-center">
-              <SignInButton className="focus:shadow-outline h-10 rounded-lg bg-purple-600 px-5 text-violet-200 transition-colors duration-150 hover:bg-gray-800" />
-            </div>
-          )}
+      <main className="flex justify-center gap-4 bg-gray-100 p-4">
+        <div className="  mx-auto max-w-md flex-auto   p-2 ">
+          <Button color="secondary" radius="full" variant="shadow">
+            your activities!
+          </Button>
         </div>
+        {isSignedIn && <CreateRequestPostWizard />}
+
+        {isSignedIn && <UserButton afterSignOutUrl="/" />}
       </main>
     </PageLayout>
   );
 };
 
 export default Home;
+
+// {!isSignedIn && (
+//   <div className="flex justify-center">
+//     <SignInButton className="focus:shadow-outline h-10 rounded-lg bg-purple-600 px-5 text-violet-200 transition-colors duration-150 hover:bg-gray-800" />
+//   </div>
+// )}
