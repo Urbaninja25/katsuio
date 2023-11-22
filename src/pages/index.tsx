@@ -21,7 +21,7 @@ const CreateRequestPostWizard = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null);
-  const [Functiondata, setFunctionData] = useState(null);
+
   return (
     <div className="w-full flex-col flex-nowrap gap-4 md:flex-nowrap">
       <div className="flex  flex-nowrap gap-4 md:flex-nowrap">
@@ -39,10 +39,9 @@ const CreateRequestPostWizard = () => {
               if (input !== "") {
                 const fetchedDataAssistance =
                   await callChatGPTWithAssistance(input);
-                const fetchedDataFunctions = await callChatGPTWithFunctions();
-                console.log(fetchedDataFunctions);
+                console.log(fetchedDataAssistance);
+
                 setData(fetchedDataAssistance);
-                setFunctionData(fetchedDataFunctions);
               }
               setInput("");
               setIsLoading(false);
@@ -63,10 +62,9 @@ const CreateRequestPostWizard = () => {
 
                   const fetchedDataAssistance =
                     await callChatGPTWithAssistance(input);
-                  const fetchedDataFunctions = await callChatGPTWithFunctions();
-                  console.log(fetchedDataFunctions);
+                  console.log(fetchedDataAssistance);
+
                   setData(fetchedDataAssistance);
-                  setFunctionData(fetchedDataFunctions);
                 } catch {
                   console.error("Error fetching data:", Error);
                 } finally {
@@ -77,20 +75,34 @@ const CreateRequestPostWizard = () => {
             >
               Post
             </Button>
+            <Button
+              color="primary"
+              onClick={async () => {
+                try {
+                  const data = await callChatGPTWithFunctions();
+                  console.log(data);
+                } catch (error) {
+                  // <-- Catch the error instance
+                  console.error("Error fetching data:", error.message); // <-- Log the error message
+                }
+              }}
+            >
+              check
+            </Button>
           </div>
         )}
       </div>
 
       {data && !isLoading && (
         <div>
-          <CreateResponsePostWizard data={data} Functiondata={Functiondata} />{" "}
+          <CreateResponsePostWizard data={data} />{" "}
         </div>
       )}
     </div>
   );
 };
 
-const CreateResponsePostWizard = ({ data, Functiondata }) => {
+const CreateResponsePostWizard = ({ data }) => {
   return (
     <div className="flex w-full flex-col p-4">
       <div>
@@ -154,7 +166,7 @@ const Home: NextPage = () => {
       <main className="flex justify-center gap-4 bg-gray-100 p-4">
         <div className="  mx-auto max-w-md flex-auto   p-2 ">
           <Button color="secondary" radius="full" variant="shadow">
-            your activities!
+            my activities!
           </Button>
         </div>
         {isSignedIn && <CreateRequestPostWizard />}

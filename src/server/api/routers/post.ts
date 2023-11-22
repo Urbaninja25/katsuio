@@ -15,7 +15,7 @@ export const postRouter = createTRPCRouter({
   getAllByUserNames: publicProcedure
     .input(z.object({ userNames: z.string() }))
     .query(async ({ ctx, input }) => {
-      const activities = await ctx.db.post.findMany({
+      const activities = await ctx.db.post.findUnique({
         where: { hostUsername: input.userNames },
         take: 100,
       });

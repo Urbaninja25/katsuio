@@ -1,8 +1,5 @@
 import openAI from "openai";
 import { api } from "~/utils/api";
-import fs from "fs";
-
-// dotenv.config({ path: "./config.env" });
 
 const openai = new openAI({
   apiKey: process.env.NEXT_PUBLIC_OPEN_AI_API_KEY,
@@ -71,25 +68,11 @@ async function callChatGPTWithAssistance(input: string) {
     throw new Error(`Error in chat function: ${error}`);
   }
 }
-
 //openai functions//
 ////////////////////////////////////////////
 
-const getActivities = async (userNames) => {
-  try {
-    const { data } = await api.post.getAllByUserNames(userNames);
-    if (!data) {
-      console.error("Error fetching activities");
-      return null;
-    }
-    return data;
-  } catch (error) {
-    console.error("Error fetching activities:", error);
-    return null;
-  }
-};
-
 //DEFINE OUR GPT FUNTION
+
 async function callChatGPTWithFunctions() {
   const messages = [
     {
@@ -100,7 +83,7 @@ async function callChatGPTWithFunctions() {
     {
       role: "user",
       content:
-        " Settle into a cozy spot, surrounded by the city's charming ambiance, and immerse yourself in the captivating world of cinema. From classic films to contemporary blockbusters, there's something for every taste and preference. This activity has a relaxing, cinematic, and atmospheric vibe. It is hosted by Irakli Gharibashvili and ends on December 21, 2023.",
+        " Certainly, adventurer! You can join a walking tour of Old Tbilisi, hosted by Mariam Menabde. The activity will take place until December 24, 2023. The meeting point is located at 41.693889, 44.806389",
     },
   ];
 
@@ -111,7 +94,7 @@ async function callChatGPTWithFunctions() {
 
     functions: [
       {
-        name: "getActivities",
+        name: "get_Activities",
         description: "call function with proper host username as an  argument ",
         parameters: {
           type: "object",
@@ -136,37 +119,20 @@ async function callChatGPTWithFunctions() {
   // STAP 2 :check if gpt actually requesting a function
   if (wantsToUseFunction) {
     //STAP 3 : USE GPT ARGUMENTS TO CALL UR FUNCTION
+
     if (
       chatCompletion?.choices?.[0]?.message?.function_call?.name ==
-      "getActivities"
+      "get_Activities"
     ) {
-      // let argumentsObj = JSON.parse(
-      //   chatCompletion.choices[0].message.function_call.arguments,
-      // );
+      let argumentsObj = JSON.parse(
+        chatCompletion.choices[0].message.function_call.arguments,
+      );
 
-      content = await getActivities(userNames);
+      content = argumentsObj.userNames;
 
       console.log(content);
-
-      messages.push(chatCompletion.choices[0].message);
-
-      messages.push({
-        role: "function",
-        name: "getActivities",
-
-        content,
-      });
     }
   }
-
-  //STAP 4 COMPILE ALL THE INFO+APPEND IT TO THE MASSAGES SEND IT BACK TO GPT SO IT CAN FINALLY DECIDE HOW IT WANTS TO HANDEL THE RESPONSE OF THE FUNCTION AND ITS DATA
-  const step4finalresponse = await openai.chat.completions.create({
-    model: "gpt-3.5-turbo-0613",
-    messages,
-  });
-
-  //final response of gpt
-  console.log(step4finalresponse?.choices?.[0]?.message.content);
+  return content;
 }
-
 export { callChatGPTWithFunctions, callChatGPTWithAssistance };
