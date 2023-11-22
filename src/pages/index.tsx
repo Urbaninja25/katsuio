@@ -21,6 +21,14 @@ const CreateRequestPostWizard = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null);
+  const substringsToCheck = [
+    "hosted by",
+    "can join",
+    "Hosted by",
+    "is hosting",
+    "joining",
+    "hostUsername",
+  ];
 
   return (
     <div className="w-full flex-col flex-nowrap gap-4 md:flex-nowrap">
@@ -75,7 +83,7 @@ const CreateRequestPostWizard = () => {
             >
               Post
             </Button>
-            <Button
+            {/* <Button
               color="primary"
               onClick={async () => {
                 try {
@@ -88,14 +96,45 @@ const CreateRequestPostWizard = () => {
               }}
             >
               check
-            </Button>
+            </Button> */}
           </div>
         )}
       </div>
 
       {data && !isLoading && (
-        <div>
-          <CreateResponsePostWizard data={data} />{" "}
+        <div className="flex flex-col  gap-2">
+          <div>
+            <Textarea
+              isDisabled
+              label="your beez"
+              labelPlacement="outside"
+              placeholder="enter your question"
+              defaultValue={data}
+              className="w-full"
+            />
+          </div>
+          <div>
+            {substringsToCheck.some((substring) =>
+              data.includes(substring),
+            ) && (
+              <Button
+                // isLoading={isLoading}
+                size="sm"
+                color="secondary"
+                variant="shadow"
+                onClick={async () => {
+                  try {
+                    const hostUsernames = await callChatGPTWithFunctions(data);
+                    console.log(hostUsernames);
+                  } catch {
+                    console.error("Error fetching data:", Error);
+                  }
+                }}
+              >
+                show me more
+              </Button>
+            )}
+          </div>
         </div>
       )}
     </div>

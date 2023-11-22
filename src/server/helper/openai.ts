@@ -65,7 +65,7 @@ async function callChatGPTWithAssistance(input: string) {
 
     return conversation;
   } catch (error) {
-    throw new Error(`Error in chat function: ${error}`);
+    throw new Error(`Error in assistant function: ${error}`);
   }
 }
 //openai functions//
@@ -73,7 +73,7 @@ async function callChatGPTWithAssistance(input: string) {
 
 //DEFINE OUR GPT FUNTION
 
-async function callChatGPTWithFunctions() {
+async function callChatGPTWithFunctions(data: string) {
   const messages = [
     {
       role: "system",
@@ -82,8 +82,7 @@ async function callChatGPTWithFunctions() {
 
     {
       role: "user",
-      content:
-        " Certainly, adventurer! You can join a walking tour of Old Tbilisi, hosted by Mariam Menabde. The activity will take place until December 24, 2023. The meeting point is located at 41.693889, 44.806389",
+      content: data,
     },
   ];
 
