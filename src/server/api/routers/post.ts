@@ -5,21 +5,28 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 export const postRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
-    await ctx.db.post.findMany({
+    await ctx.db.activity.findMany({
       take: 100,
-      orderBy: {
-        created_at: "desc",
-      },
     });
   }),
   getAllByUserNames: publicProcedure
-    .input(z.object({ userNames: z.string() }))
+    .input(z.object({ userNameData: z.string() }))
     .query(async ({ ctx, input }) => {
-      const activities = await ctx.db.post.findUnique({
-        where: { hostUsername: input.userNames },
-        take: 100,
+      const userNameDataArray = input.userNameData.split(",");
+      console.log(userNameDataArray);
+
+      const activities = await ctx.db.activity.findMany({
+        where: {
+          OR: userNameDataArray.map((userName) => ({
+            hostUsername: userName.trim(), // Trim to remove extra spaces
+          })),
+        },
       });
-      if (!activities) throw new TRPCError({ code: "NOT_FOUND" });
+
+      if (!activities || activities.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
       return activities;
     }),
 });

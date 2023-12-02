@@ -94,14 +94,15 @@ async function callChatGPTWithFunctions(data: string) {
     functions: [
       {
         name: "get_Activities",
-        description: "call function with proper host username as an  argument ",
+        description:
+          "call function with proper host username or person username which hosting certain activity  as an  argument ",
         parameters: {
           type: "object",
           properties: {
             userNames: {
               type: "string",
               decription:
-                "  host username of  certain activity (e.g here It is hosted by Irakli Gharibashvili ,hostUsername will be Irakli Gharibashvili ) ",
+                "  host username or person username which hosting certain activity (e.g here It is hosted by Irakli Gharibashvili ,hostUsername will be Irakli Gharibashvili ) ",
             },
           },
           required: ["userNames"],

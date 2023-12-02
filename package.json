@@ -26,6 +26,7 @@
     "animejs": "^3.2.1",
     "dotenv": "^16.3.1",
     "framer-motion": "^10.16.5",
+    "leaflet": "^1.9.4",
     "next": "^14.0.0",
     "openai": "^4.18.0",
     "react": "18.2.0",

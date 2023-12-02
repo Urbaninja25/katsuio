@@ -15,12 +15,15 @@ import {
 } from "~/server/helper/openai";
 
 import { PageLayout } from "~/componenets/layout";
-import { LoadingPage, LoadingSpinner } from "~/componenets/loading";
 
 const CreateRequestPostWizard = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingUserNames, setIsLoadingUserNames] = useState(false);
   const [data, setData] = useState(null);
+  const [userNamedata, setuserNameData] = useState(null);
+  const [showResponse, setShowResponse] = useState(false);
+
   const substringsToCheck = [
     "hosted by",
     "can join",
@@ -28,6 +31,11 @@ const CreateRequestPostWizard = () => {
     "is hosting",
     "joining",
     "hostUsername",
+    "hosting",
+    "join",
+    "offering",
+    "with",
+    "guided",
   ];
 
   return (
@@ -66,6 +74,7 @@ const CreateRequestPostWizard = () => {
               variant="shadow"
               onClick={async () => {
                 try {
+                  setShowResponse(false);
                   setIsLoading(true);
 
                   const fetchedDataAssistance =
@@ -83,20 +92,6 @@ const CreateRequestPostWizard = () => {
             >
               Post
             </Button>
-            {/* <Button
-              color="primary"
-              onClick={async () => {
-                try {
-                  const data = await callChatGPTWithFunctions();
-                  console.log(data);
-                } catch (error) {
-                  // <-- Catch the error instance
-                  console.error("Error fetching data:", error.message); // <-- Log the error message
-                }
-              }}
-            >
-              check
-            </Button> */}
           </div>
         )}
       </div>
@@ -105,7 +100,6 @@ const CreateRequestPostWizard = () => {
         <div className="flex flex-col  gap-2">
           <div>
             <Textarea
-              isDisabled
               label="your beez"
               labelPlacement="outside"
               placeholder="enter your question"
@@ -118,14 +112,20 @@ const CreateRequestPostWizard = () => {
               data.includes(substring),
             ) && (
               <Button
-                // isLoading={isLoading}
+                isLoading={isLoadingUserNames}
                 size="sm"
                 color="secondary"
                 variant="shadow"
                 onClick={async () => {
                   try {
-                    const hostUsernames = await callChatGPTWithFunctions(data);
-                    console.log(hostUsernames);
+                    setIsLoadingUserNames(true);
+                    const fetchedHostUsernames =
+                      await callChatGPTWithFunctions(data);
+                    console.log(fetchedHostUsernames); //ვიღებ აქ მაგ დატას
+
+                    setuserNameData(fetchedHostUsernames);
+                    setShowResponse(true);
+                    setIsLoadingUserNames(false);
                   } catch {
                     console.error("Error fetching data:", Error);
                   }
@@ -135,54 +135,37 @@ const CreateRequestPostWizard = () => {
               </Button>
             )}
           </div>
+          {showResponse && !isLoadingUserNames && (
+            <CreateResponsePostWizard userNameData={userNamedata} />
+          )}
         </div>
       )}
     </div>
   );
 };
 
-const CreateResponsePostWizard = ({ data }) => {
+const CreateResponsePostWizard = ({ userNameData }) => {
+  console.log(userNameData);
+  const { data, isLoading } = api.post.getAllByUserNames.useQuery({
+    userNameData,
+  });
+  console.log(data);
+  if (isLoading) {
+    return <>Loading...NU SHEMCEM</>;
+  }
+  if (!data) return <>faillll</>;
   return (
-    <div className="flex w-full flex-col p-4">
-      <div>
-        <Textarea
-          isDisabled
-          label="your beez"
-          labelPlacement="outside"
-          placeholder="enter your question"
-          defaultValue={data}
-          className="w-full"
-        />
-      </div>
-      <Tabs aria-label="Options">
-        <Tab key="photos" title="Photos">
-          <Card>
-            <CardBody>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat.
-            </CardBody>
-          </Card>
-        </Tab>
-        <Tab key="music" title="Music">
-          <Card>
-            <CardBody>
-              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-              reprehenderit in voluptate velit esse cillum dolore eu fugiat
-              nulla pariatur.
-            </CardBody>
-          </Card>
-        </Tab>
-        <Tab key="videos" title="Videos">
-          <Card>
-            <CardBody>
-              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
-              officia deserunt mollit anim id est laborum.
-            </CardBody>
-          </Card>
-        </Tab>
+    <div className="flex w-full flex-col">
+      <Tabs aria-label="Options" size={"sm"}>
+        {data.map((item, index) => (
+          <Tab key={index} title={item.hostUsername}>
+            <Card>
+              <CardBody>
+                <p>{item.description}</p>
+              </CardBody>
+            </Card>
+          </Tab>
+        ))}
       </Tabs>
     </div>
   );
@@ -192,6 +175,18 @@ const Home: NextPage = () => {
   const { isLoaded: userLoaded, isSignedIn } = useUser();
 
   if (!userLoaded) return <div />;
+
+  if (navigator.geolocation)
+    navigator.geolocation.getCurrentPosition(
+      function (position) {
+        console.log(position);
+      },
+      function () {
+        alert(
+          "Katsuio API utilizes your location to provide tailored activities based on your current whereabouts. Please allow location sharing from ur browser to enable us to offer you the best-suited activities",
+        );
+      },
+    );
   return (
     <PageLayout>
       <Head>
@@ -211,15 +206,14 @@ const Home: NextPage = () => {
         {isSignedIn && <CreateRequestPostWizard />}
 
         {isSignedIn && <UserButton afterSignOutUrl="/" />}
+        {!isSignedIn && (
+          <div className="flex justify-center">
+            <SignInButton className="focus:shadow-outline h-10 rounded-lg bg-purple-600 px-5 text-violet-200 transition-colors duration-150 hover:bg-gray-800" />
+          </div>
+        )}
       </main>
     </PageLayout>
   );
 };
 
 export default Home;
-
-// {!isSignedIn && (
-//   <div className="flex justify-center">
-//     <SignInButton className="focus:shadow-outline h-10 rounded-lg bg-purple-600 px-5 text-violet-200 transition-colors duration-150 hover:bg-gray-800" />
-//   </div>
-// )}
