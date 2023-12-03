@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useUser, SignInButton, UserButton } from "@clerk/nextjs";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
@@ -13,7 +13,6 @@ import {
 } from "~/server/helper/openai";
 import { PageLayout } from "~/componenets/layout";
 import dynamic from "next/dynamic";
-import { MyMap } from "~/componenets/Map";
 
 const CreateRequestPostWizard = () => {
   const [input, setInput] = useState("");
@@ -146,10 +145,60 @@ const CreateRequestPostWizard = () => {
 };
 
 const CreateResponsePostWizard = ({ userNameData }) => {
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(
+    null,
+  );
+  const [loadingLocation, setIsLoading] = useState(true);
+
   console.log(userNameData);
   const { data, isLoading } = api.post.getAllByUserNames.useQuery({
     userNameData,
   });
+
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      setIsLoading(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation([
+            position.coords.latitude,
+            position.coords.longitude,
+          ]);
+          setIsLoading(false);
+        },
+        (error) => {
+          console.error("Error getting user location:", error);
+          setIsLoading(false);
+        },
+      );
+    } else {
+      console.error(
+        "Geolocation is not supported in this browser. Please give katsuio access to your geolocation data",
+      );
+    }
+  }, []);
+
+  function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Earth's radius in kilometers
+
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) *
+        Math.cos(deg2rad(lat1)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
+  }
+
+  function deg2rad(deg) {
+    return deg * (Math.PI / 180);
+  }
 
   const Map = useMemo(
     () =>
@@ -166,21 +215,45 @@ const CreateResponsePostWizard = ({ userNameData }) => {
   if (!data) return <div>faillll</div>;
   return (
     <div className="flex w-full flex-col">
-      <Tabs aria-label="Options" size={"sm"}>
-        {data.map((item, index) => (
-          <Tab key={index} title={item.hostUsername}>
-            <Card>
-              <CardBody>
-                <div className="mb-2 border-b border-gray-300 ">
-                  {item.description}
+      {!loadingLocation && (
+        <Tabs aria-label="Options" size={"lg"}>
+          {data.map((item, index) => (
+            <Tab
+              key={index}
+              title={
+                <div className="flex items-center  ">
+                  <span className="flex-none">{item.hostUsername}</span>
+                  <div className="w-2.5"> </div>
+                  <Button
+                    isDisabled
+                    size="sm"
+                    radius="full"
+                    color="success"
+                    className=" flex-1"
+                  >
+                    {calculateDistance(
+                      userLocation[0],
+                      userLocation[1],
+                      parseFloat(item.location.split(",")[0]),
+                      parseFloat(item.location.split(",")[1]),
+                    ).toFixed(2) + " km"}
+                  </Button>
                 </div>
+              }
+            >
+              <Card>
+                <CardBody>
+                  <div className="mb-2 border-b border-gray-300 ">
+                    {item.description}
+                  </div>
 
-                <Map className="mt-1" position={item.location.split(",")} />
-              </CardBody>
-            </Card>
-          </Tab>
-        ))}
-      </Tabs>
+                  <Map className="mt-1" position={item.location.split(",")} />
+                </CardBody>
+              </Card>
+            </Tab>
+          ))}
+        </Tabs>
+      )}
     </div>
   );
 };

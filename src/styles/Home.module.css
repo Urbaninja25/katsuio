@@ -1,6 +1,4 @@
 .leaflet {
-  /* position: absolute;
-  top: 0; */
-  width: 900px;
-  height: 300px;
+  width: 100vh;
+  height: 100vh;
 }

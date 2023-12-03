@@ -22,6 +22,7 @@ export default function MyMap(props: any) {
           `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position[0]}&lon=${position[1]}&zoom=18&addressdetails=1`,
         );
         const data = await response.json();
+        console.log(data);
         if (data && data.address) {
           setAddress(data.display_name); // Update state with the street name
         }
@@ -80,9 +81,15 @@ export default function MyMap(props: any) {
         url="https://api.maptiler.com/maps/basic-v2/256/{z}/{x}/{y}.png?key=CIEq0nQN9kXZpHrRLesM"
       />
       <Marker position={position} icon={customIconForActivityMarker}>
-        <Popup autoPan={false} closeButton={false}>
-          {address}
-        </Popup>
+        {address ? (
+          <Popup autoPan={false} closeButton={false}>
+            {address}
+          </Popup>
+        ) : (
+          <Popup autoPan={false} closeButton={false}>
+            Activity Location
+          </Popup>
+        )}
       </Marker>
       {userLocation && (
         <Marker position={userLocation} icon={customIconForUserMarker}>
