@@ -21,6 +21,7 @@ const CreateRequestPostWizard = () => {
   const [data, setData] = useState(null);
   const [userNamedata, setuserNameData] = useState(null);
   const [showResponse, setShowResponse] = useState(false);
+  const [showBtn, setShowBtn] = useState(true);
 
   const substringsToCheck = [
     "hosted by",
@@ -49,7 +50,7 @@ const CreateRequestPostWizard = () => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={async (e) => {
-            if (e.key === "Enter") {
+            if (e.key === "Enter" && !e.shiftKey) {
               setIsLoading(true);
               e.preventDefault();
               if (input !== "") {
@@ -82,6 +83,7 @@ const CreateRequestPostWizard = () => {
                   console.log(fetchedDataAssistance);
 
                   setData(fetchedDataAssistance);
+                  setShowBtn(true);
                 } catch {
                   console.error("Error fetching data:", Error);
                 } finally {
@@ -108,32 +110,32 @@ const CreateRequestPostWizard = () => {
             />
           </div>
           <div>
-            {substringsToCheck.some((substring) =>
-              data.includes(substring),
-            ) && (
-              <Button
-                isLoading={isLoadingUserNames}
-                size="sm"
-                color="secondary"
-                variant="shadow"
-                onClick={async () => {
-                  try {
-                    setIsLoadingUserNames(true);
-                    const fetchedHostUsernames =
-                      await callChatGPTWithFunctions(data);
-                    console.log(fetchedHostUsernames); //ვიღებ აქ მაგ დატას
+            {substringsToCheck.some((substring) => data.includes(substring)) &&
+              showBtn && (
+                <Button
+                  isLoading={isLoadingUserNames}
+                  size="sm"
+                  color="secondary"
+                  variant="shadow"
+                  onClick={async () => {
+                    try {
+                      setIsLoadingUserNames(true);
+                      const fetchedHostUsernames =
+                        await callChatGPTWithFunctions(data);
+                      console.log(fetchedHostUsernames); //ვიღებ აქ მაგ დატას
 
-                    setuserNameData(fetchedHostUsernames);
-                    setShowResponse(true);
-                    setIsLoadingUserNames(false);
-                  } catch {
-                    console.error("Error fetching data:", Error);
-                  }
-                }}
-              >
-                show me more
-              </Button>
-            )}
+                      setuserNameData(fetchedHostUsernames);
+                      setShowResponse(true);
+                      setIsLoadingUserNames(false);
+                      setShowBtn(false);
+                    } catch {
+                      console.error("Error fetching data:", Error);
+                    }
+                  }}
+                >
+                  show me more
+                </Button>
+              )}
           </div>
           {showResponse && !isLoadingUserNames && (
             <CreateResponsePostWizard userNameData={userNamedata} />
