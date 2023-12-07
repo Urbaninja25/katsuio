@@ -13,6 +13,11 @@ import {
 } from "~/server/helper/openai";
 import { PageLayout } from "~/componenets/layout";
 import dynamic from "next/dynamic";
+import toast from "react-hot-toast";
+import CustomToast from "~/componenets/toast";
+import { SkeletonComponent } from "~/componenets/Skeleton";
+import { LoadingPage } from "~/componenets/LoadingSpinner";
+import Image from "next/image";
 
 const CreateRequestPostWizard = () => {
   const [input, setInput] = useState("");
@@ -54,11 +59,17 @@ const CreateRequestPostWizard = () => {
               setIsLoading(true);
               e.preventDefault();
               if (input !== "") {
-                const fetchedDataAssistance =
-                  await callChatGPTWithAssistance(input);
-                console.log(fetchedDataAssistance);
-
-                setData(fetchedDataAssistance);
+                try {
+                  const fetchedDataAssistance =
+                    await callChatGPTWithAssistance(input);
+                  console.log(fetchedDataAssistance);
+                  setData(fetchedDataAssistance);
+                } catch (error) {
+                  CustomToast({
+                    message:
+                      "Server high traffic. Retry in 30 secs. Apologies for inconvenience; project in experimental phase",
+                  });
+                }
               }
               setInput("");
               setIsLoading(false);
@@ -85,7 +96,10 @@ const CreateRequestPostWizard = () => {
                   setData(fetchedDataAssistance);
                   setShowBtn(true);
                 } catch {
-                  console.error("Error fetching data:", Error);
+                  CustomToast({
+                    message:
+                      "Server high traffic. Retry in 30 secs. Apologies for inconvenience; project in experimental phase",
+                  });
                 } finally {
                   setIsLoading(false); // Ensure isLoading is set to false after operation completes
                   setInput("");
@@ -126,8 +140,8 @@ const CreateRequestPostWizard = () => {
 
                       setuserNameData(fetchedHostUsernames);
                       setShowResponse(true);
-                      setIsLoadingUserNames(false);
                       setShowBtn(false);
+                      setIsLoadingUserNames(false);
                     } catch {
                       console.error("Error fetching data:", Error);
                     }
@@ -137,6 +151,7 @@ const CreateRequestPostWizard = () => {
                 </Button>
               )}
           </div>
+
           {showResponse && !isLoadingUserNames && (
             <CreateResponsePostWizard userNameData={userNamedata} />
           )}
@@ -211,10 +226,18 @@ const CreateResponsePostWizard = ({ userNameData }) => {
     [],
   );
   console.log(Map);
+
   if (isLoading) {
-    return <div>Loading...NU SHEMCEM</div>;
+    return <SkeletonComponent />;
   }
-  if (!data) return <div>faillll</div>;
+
+  if (!data) {
+    CustomToast({
+      message: "Database communication problem—fix in progress!",
+    });
+    return <div>faillll</div>;
+  }
+
   return (
     <div className="flex w-full flex-col">
       {!loadingLocation && (
@@ -276,10 +299,13 @@ const Home: NextPage = () => {
       </Head>
 
       <main className="flex justify-center gap-4 bg-gray-100 p-4">
-        <div className="  mx-auto max-w-md flex-auto   p-2 ">
-          <Button color="secondary" radius="full" variant="shadow">
-            my activities!
-          </Button>
+        <div>
+          <Image
+            src="/images/main-logo-transparent.svg"
+            alt="Logo"
+            width={80}
+            height={300}
+          />
         </div>
         {isSignedIn && <CreateRequestPostWizard />}
 
@@ -295,3 +321,12 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+{
+  /* <Image
+src="/images/main-logo-transparent.svg"
+alt="Logo"
+width={200}
+height={100}
+/> */
+}
