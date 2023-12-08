@@ -28,6 +28,63 @@ const CreateRequestPostWizard = () => {
   const [showResponse, setShowResponse] = useState(false);
   const [showBtn, setShowBtn] = useState(true);
 
+  // Handle  post btn click
+  const handleDataFetch = async () => {
+    try {
+      setData(null);
+      setIsLoading(true);
+      setShowResponse(false);
+
+      const fetchedDataAssistance = await callChatGPTWithAssistance(input);
+
+      setData(fetchedDataAssistance);
+      setShowBtn(true);
+    } catch {
+      CustomToast({
+        message:
+          "Server high traffic. Retry in 30 secs. Apologies for inconvenience; project in experimental phase",
+      });
+    } finally {
+      setIsLoading(false);
+      setInput("");
+    }
+  };
+
+  // Handle Enter key press in the input
+  const handleEnterKey = async (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      setIsLoading(true);
+      e.preventDefault();
+      if (input !== "") {
+        try {
+          await handleDataFetch();
+        } catch (error) {
+          // Handle errors if needed
+        }
+      }
+      setIsLoading(false);
+    }
+  };
+
+  const fetchHostUsernames = async () => {
+    try {
+      setIsLoadingUserNames(true);
+
+      const fetchedHostUsernames = await callChatGPTWithFunctions(data);
+
+      setuserNameData(fetchedHostUsernames);
+      setShowResponse(true);
+      setShowBtn(false);
+    } catch {
+      CustomToast({
+        message:
+          "Server high traffic. Retry in 60 secs. Apologies for inconvenience; project in experimental phase",
+      });
+    } finally {
+      setIsLoadingUserNames(false);
+    }
+  };
+
   const substringsToCheck = [
     "hosted by",
     "can join",
@@ -56,74 +113,31 @@ const CreateRequestPostWizard = () => {
           disabled={isLoading}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={async (e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              setIsLoading(true);
-              e.preventDefault();
-              if (input !== "") {
-                try {
-                  setData(null);
-                  setIsLoading(true);
-                  setShowResponse(false);
-
-                  const fetchedDataAssistance =
-                    await callChatGPTWithAssistance(input);
-                  console.log(fetchedDataAssistance);
-                  setData(fetchedDataAssistance);
-                  setShowBtn(true);
-                } catch (error) {
-                  CustomToast({
-                    message:
-                      "Server high traffic. Retry in 30 secs. Apologies for inconvenience; project in experimental phase",
-                  });
-                }
-              }
-              setInput("");
-              setIsLoading(false);
-            }
-          }}
+          onKeyDown={handleEnterKey}
         />
 
         {input !== "" && (
           <div>
-            <Button
-              isLoading={isLoading}
-              size="sm"
-              color="secondary"
-              variant="shadow"
-              onClick={async () => {
-                try {
-                  setData(null);
-                  setIsLoading(true);
-                  setShowResponse(false);
-
-                  const fetchedDataAssistance =
-                    await callChatGPTWithAssistance(input);
-                  console.log(fetchedDataAssistance);
-
-                  setData(fetchedDataAssistance);
-                  setShowBtn(true);
-                } catch {
-                  CustomToast({
-                    message:
-                      "Server high traffic. Retry in 30 secs. Apologies for inconvenience; project in experimental phase",
-                  });
-                } finally {
-                  setIsLoading(false); // Ensure isLoading is set to false after operation completes
-                  setInput("");
-                }
-              }}
-            >
-              Post
-            </Button>
+            <div>
+              <Button
+                isLoading={isLoading}
+                size="sm"
+                color="secondary"
+                variant="shadow"
+                onClick={handleDataFetch}
+              >
+                Post
+              </Button>
+            </div>
+            {isLoading && (
+              <div>
+                <LoadingWithPercentage />
+              </div>
+            )}
           </div>
         )}
       </div>
-      {isLoading && (
-        <div>
-          <LoadingWithPercentage />
-        </div>
-      )}
+
       {data && !isLoading && (
         <div className="flex flex-col  gap-2">
           <div>
@@ -143,22 +157,7 @@ const CreateRequestPostWizard = () => {
                   size="sm"
                   color="secondary"
                   variant="shadow"
-                  onClick={async () => {
-                    try {
-                      setIsLoadingUserNames(true);
-
-                      const fetchedHostUsernames =
-                        await callChatGPTWithFunctions(data);
-                      console.log(fetchedHostUsernames); //ვიღებ აქ მაგ დატას
-
-                      setuserNameData(fetchedHostUsernames);
-                      setShowResponse(true);
-                      setShowBtn(false);
-                      setIsLoadingUserNames(false);
-                    } catch {
-                      console.error("Error fetching data:", Error);
-                    }
-                  }}
+                  onClick={fetchHostUsernames}
                 >
                   show me more
                 </Button>
@@ -179,13 +178,13 @@ const CreateResponsePostWizard = ({ userNameData }) => {
     null,
   );
   const [loadingLocation, setIsLoading] = useState(true);
+  const [hasToastShown, setHasToastShown] = useState(false);
 
-  console.log(userNameData);
   const { data, isLoading } = api.post.getAllByUserNames.useQuery({
     userNameData,
   });
 
-  useEffect(() => {
+  const getUserLocation = () => {
     if ("geolocation" in navigator) {
       setIsLoading(true);
       navigator.geolocation.getCurrentPosition(
@@ -198,15 +197,44 @@ const CreateResponsePostWizard = ({ userNameData }) => {
         },
         (error) => {
           console.error("Error getting user location:", error);
+          CustomToast({
+            message:
+              "Katsuio requires access to your current location to provide you with the complete experience. Please adjust your browser settings to allow Katsuio access to your location",
+          });
           setIsLoading(false);
         },
       );
     } else {
-      console.error(
-        "Geolocation is not supported in this browser. Please give katsuio access to your geolocation data",
-      );
+      CustomToast({
+        message:
+          "Katsuio requires access to your current location to provide you with the complete experience. Please adjust your browser settings to allow Katsuio access to your location",
+      });
+      setLocationError(true);
     }
+  };
+
+  useEffect(() => {
+    getUserLocation();
   }, []);
+
+  const Map = useMemo(
+    () =>
+      dynamic(() => import("../componenets/Map"), {
+        loading: () => <p>A map is loading</p>,
+        ssr: false,
+      }),
+    [],
+  );
+
+  if (isLoading) {
+    return <SkeletonComponent />;
+  }
+
+  if (!data) {
+    CustomToast({
+      message: "Database communication problem—fix in progress!",
+    });
+  }
 
   function calculateDistance(lat1, lon1, lat2, lon2) {
     const R = 6371; // Earth's radius in kilometers
@@ -230,27 +258,6 @@ const CreateResponsePostWizard = ({ userNameData }) => {
     return deg * (Math.PI / 180);
   }
 
-  const Map = useMemo(
-    () =>
-      dynamic(() => import("../componenets/Map"), {
-        loading: () => <p>A map is loading</p>,
-        ssr: false,
-      }),
-    [],
-  );
-  console.log(Map);
-
-  if (isLoading) {
-    return <SkeletonComponent />;
-  }
-
-  if (!data) {
-    CustomToast({
-      message: "Database communication problem—fix in progress!",
-    });
-    return <div>faillll</div>;
-  }
-
   return (
     <div className="flex w-full flex-col">
       {!loadingLocation && (
@@ -262,20 +269,22 @@ const CreateResponsePostWizard = ({ userNameData }) => {
                 <div className="flex items-center  ">
                   <span className="flex-none">{item.hostUsername}</span>
                   <div className="w-2.5"> </div>
-                  <Button
-                    isDisabled
-                    size="sm"
-                    radius="full"
-                    color="success"
-                    className=" flex-1"
-                  >
-                    {calculateDistance(
-                      userLocation[0],
-                      userLocation[1],
-                      parseFloat(item.location.split(",")[0]),
-                      parseFloat(item.location.split(",")[1]),
-                    ).toFixed(2) + " km"}
-                  </Button>
+                  {userLocation && (
+                    <Button
+                      isDisabled
+                      size="sm"
+                      radius="full"
+                      color="success"
+                      className=" flex-1"
+                    >
+                      {calculateDistance(
+                        userLocation[0],
+                        userLocation[1],
+                        parseFloat(item.location.split(",")[0]),
+                        parseFloat(item.location.split(",")[1]),
+                      ).toFixed(2) + " km"}
+                    </Button>
+                  )}
                 </div>
               }
             >
@@ -303,22 +312,18 @@ const Home: NextPage = () => {
 
   return (
     <PageLayout>
-      <Head>
-        <title>Create your unique experiancies</title>
-
-        <meta name="description" content="Generated by create-t3-app" />
-
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
       <main className="flex justify-center gap-4 bg-gray-100 p-4">
-        <div>
-          <Image
-            src="/images/main-logo-transparent.svg"
-            alt="Logo"
-            width={80}
-            height={300}
-          />
+        <div className="flex flex-col items-center">
+          <div>
+            <Image
+              src="/images/jantonalcor_snail.svg"
+              alt="Logo"
+              width={80}
+              height={300}
+              priority
+            />
+          </div>
+          <div>KatsuioAI</div>
         </div>
         {isSignedIn && <CreateRequestPostWizard />}
 
@@ -334,12 +339,3 @@ const Home: NextPage = () => {
 };
 
 export default Home;
-
-{
-  /* <Image
-src="/images/main-logo-transparent.svg"
-alt="Logo"
-width={200}
-height={100}
-/> */
-}

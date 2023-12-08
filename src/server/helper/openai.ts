@@ -1,12 +1,10 @@
 import openAI from "openai";
-import { api } from "~/utils/api";
 
 const openai = new openAI({
   apiKey: process.env.NEXT_PUBLIC_OPEN_AI_API_KEY,
   dangerouslyAllowBrowser: true,
 });
-//openai assistanse//
-///////////////////////////////////
+
 async function callChatGPTWithAssistance(input: string) {
   try {
     const assistant = await openai.beta.assistants.retrieve(
@@ -45,7 +43,6 @@ async function callChatGPTWithAssistance(input: string) {
           }
         });
 
-        console.log(conversation.trim());
         return conversation.trim();
       } else {
         throw new Error("Run is not completed yet.");
@@ -60,7 +57,7 @@ async function callChatGPTWithAssistance(input: string) {
         } catch (error) {
           reject(error);
         }
-      }, 60000);
+      }, 65000);
     });
 
     return conversation;
@@ -68,10 +65,6 @@ async function callChatGPTWithAssistance(input: string) {
     throw new Error(`Error in assistant function: ${error}`);
   }
 }
-//openai functions//
-////////////////////////////////////////////
-
-//DEFINE OUR GPT FUNTION
 
 async function callChatGPTWithFunctions(data: string) {
   const messages = [
@@ -118,7 +111,7 @@ async function callChatGPTWithFunctions(data: string) {
 
   // STAP 2 :check if gpt actually requesting a function
   if (wantsToUseFunction) {
-    //STAP 3 : USE GPT ARGUMENTS TO CALL UR FUNCTION
+    //STAP 3 : USE GPT ARGUMENTS TO CALL FUNCTION
 
     if (
       chatCompletion?.choices?.[0]?.message?.function_call?.name ==
@@ -129,8 +122,6 @@ async function callChatGPTWithFunctions(data: string) {
       );
 
       content = argumentsObj.userNames;
-
-      console.log(content);
     }
   }
   return content;

@@ -8,7 +8,6 @@ import L from "leaflet";
 
 export default function MyMap(props: any) {
   const { position } = props;
-  console.log(position);
 
   const [address, setAddress] = useState("");
   const [userLocation, setUserLocation] = useState<[number, number] | null>(
@@ -22,7 +21,7 @@ export default function MyMap(props: any) {
           `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position[0]}&lon=${position[1]}&zoom=18&addressdetails=1`,
         );
         const data = await response.json();
-        console.log(data);
+
         if (data && data.address) {
           setAddress(data.display_name); // Update state with the street name
         }
