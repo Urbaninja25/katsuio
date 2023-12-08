@@ -16,8 +16,8 @@ import dynamic from "next/dynamic";
 import toast from "react-hot-toast";
 import CustomToast from "~/componenets/toast";
 import { SkeletonComponent } from "~/componenets/Skeleton";
-import { LoadingPage } from "~/componenets/LoadingSpinner";
 import Image from "next/image";
+import { LoadingWithPercentage } from "~/componenets/LoadingSpinner";
 
 const CreateRequestPostWizard = () => {
   const [input, setInput] = useState("");
@@ -42,6 +42,8 @@ const CreateRequestPostWizard = () => {
     "guided",
     "by",
     "location",
+    "host",
+    "Host",
   ];
 
   return (
@@ -60,10 +62,15 @@ const CreateRequestPostWizard = () => {
               e.preventDefault();
               if (input !== "") {
                 try {
+                  setData(null);
+                  setIsLoading(true);
+                  setShowResponse(false);
+
                   const fetchedDataAssistance =
                     await callChatGPTWithAssistance(input);
                   console.log(fetchedDataAssistance);
                   setData(fetchedDataAssistance);
+                  setShowBtn(true);
                 } catch (error) {
                   CustomToast({
                     message:
@@ -86,8 +93,9 @@ const CreateRequestPostWizard = () => {
               variant="shadow"
               onClick={async () => {
                 try {
-                  setShowResponse(false);
+                  setData(null);
                   setIsLoading(true);
+                  setShowResponse(false);
 
                   const fetchedDataAssistance =
                     await callChatGPTWithAssistance(input);
@@ -111,7 +119,11 @@ const CreateRequestPostWizard = () => {
           </div>
         )}
       </div>
-
+      {isLoading && (
+        <div>
+          <LoadingWithPercentage />
+        </div>
+      )}
       {data && !isLoading && (
         <div className="flex flex-col  gap-2">
           <div>
@@ -134,6 +146,7 @@ const CreateRequestPostWizard = () => {
                   onClick={async () => {
                     try {
                       setIsLoadingUserNames(true);
+
                       const fetchedHostUsernames =
                         await callChatGPTWithFunctions(data);
                       console.log(fetchedHostUsernames); //ვიღებ აქ მაგ დატას
