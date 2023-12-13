@@ -10,6 +10,9 @@ export default {
   theme: {
     extend: {},
   },
+  screens: {
+    tablet: "690px",
+  },
   darkMode: "class",
   plugins: [nextui()],
 } satisfies Config;

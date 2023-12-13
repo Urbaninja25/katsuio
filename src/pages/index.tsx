@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { useUser, SignInButton, UserButton } from "@clerk/nextjs";
+import { useUser, UserButton } from "@clerk/nextjs";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { type NextPage } from "next";
@@ -104,8 +104,8 @@ const CreateRequestPostWizard = () => {
   ];
 
   return (
-    <div className="w-full flex-col flex-nowrap gap-4 md:flex-nowrap">
-      <div className="flex  flex-nowrap gap-4 md:flex-nowrap ">
+    <div className="w-full flex-col flex-nowrap gap-4 ">
+      <div className="flex  flex-nowrap gap-4  ">
         <Input
           type="text"
           label=" find your unique experiancies"
@@ -236,6 +236,13 @@ const CreateResponsePostWizard = ({ userNameData }) => {
     CustomToast({
       message: "Database communication problem—fix in progress!",
     });
+    return (
+      <div className="flex h-80 items-center justify-center">
+        <p className="text-red-500">
+          Database communication problem—fix in progress!
+        </p>
+      </div>
+    );
   }
 
   function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -263,13 +270,13 @@ const CreateResponsePostWizard = ({ userNameData }) => {
   return (
     <div className="flex w-full flex-col">
       {!loadingLocation && (
-        <Tabs aria-label="Options" size={"lg"}>
+        <Tabs aria-label="Options" size={"sm"}>
           {data.map((item, index) => (
             <Tab
               key={index}
               title={
                 <div className="flex items-center  ">
-                  <span className="flex-none">{item.hostUsername}</span>
+                  <p className="flex-none text-xs">{item.hostUsername}</p>
                   <div className="w-2.5"> </div>
                   {userLocation && (
                     <Button
@@ -296,7 +303,7 @@ const CreateResponsePostWizard = ({ userNameData }) => {
                     {item.description}
                   </div>
 
-                  <Map className="mt-1" position={item.location.split(",")} />
+                  <Map className="mt-1 " position={item.location.split(",")} />
                 </CardBody>
               </Card>
             </Tab>
@@ -314,7 +321,7 @@ const Home: NextPage = () => {
 
   return (
     <PageLayout>
-      <div className="flex justify-center gap-4  p-4">
+      <div className="flex  justify-center gap-4  p-4">
         {isSignedIn ? (
           <>
             <div className="flex flex-col items-center">
@@ -322,12 +329,12 @@ const Home: NextPage = () => {
                 <Image
                   src="/images/jantonalcor_snail.svg"
                   alt="Logo"
-                  width={80}
+                  width={40}
                   height={300}
                   priority
                 />
               </div>
-              <div>KatsuioAI</div>
+              <p>KatsuioAI</p>
             </div>
             <CreateRequestPostWizard />
             <UserButton afterSignOutUrl="/" />
