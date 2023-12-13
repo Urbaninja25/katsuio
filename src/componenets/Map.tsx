@@ -19,11 +19,6 @@ export default function MyMap(props: any) {
       try {
         const response = await fetch(
           `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position[0]}&lon=${position[1]}&zoom=18&addressdetails=1`,
-          {
-            headers: {
-              "Access-Control-Allow-Origin": "*", // Use "*" with caution in production
-            },
-          },
         );
         const data = await response.json();
 
