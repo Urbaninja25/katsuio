@@ -1,4 +1,3 @@
-import Head from "next/head";
 import { useMemo, useState, useEffect } from "react";
 import { useUser, SignInButton, UserButton } from "@clerk/nextjs";
 import { Button } from "@nextui-org/react";
@@ -18,6 +17,7 @@ import CustomToast from "~/componenets/toast";
 import { SkeletonComponent } from "~/componenets/Skeleton";
 import Image from "next/image";
 import { LoadingWithPercentage } from "~/componenets/LoadingSpinner";
+import { SignInPage } from "~/componenets/signInPage";
 
 const CreateRequestPostWizard = () => {
   const [input, setInput] = useState("");
@@ -105,7 +105,7 @@ const CreateRequestPostWizard = () => {
 
   return (
     <div className="w-full flex-col flex-nowrap gap-4 md:flex-nowrap">
-      <div className="flex  flex-nowrap gap-4 md:flex-nowrap">
+      <div className="flex  flex-nowrap gap-4 md:flex-nowrap ">
         <Input
           type="text"
           label=" find your unique experiancies"
@@ -178,7 +178,7 @@ const CreateResponsePostWizard = ({ userNameData }) => {
     null,
   );
   const [loadingLocation, setIsLoading] = useState(true);
-  const [hasToastShown, setHasToastShown] = useState(false);
+  const [geolocationDenied, setGeolocationDenied] = useState(false);
 
   const { data, isLoading } = api.post.getAllByUserNames.useQuery({
     userNameData,
@@ -197,19 +197,12 @@ const CreateResponsePostWizard = ({ userNameData }) => {
         },
         (error) => {
           console.error("Error getting user location:", error);
-          CustomToast({
-            message:
-              "Katsuio requires access to your current location to provide you with the complete experience. Please adjust your browser settings to allow Katsuio access to your location",
-          });
+          setGeolocationDenied(true); // Set flag if user denies geolocation
           setIsLoading(false);
         },
       );
     } else {
-      CustomToast({
-        message:
-          "Katsuio requires access to your current location to provide you with the complete experience. Please adjust your browser settings to allow Katsuio access to your location",
-      });
-      setLocationError(true);
+      setGeolocationDenied(true); // Set flag if geolocation is not supported
     }
   };
 
@@ -217,6 +210,15 @@ const CreateResponsePostWizard = ({ userNameData }) => {
     getUserLocation();
   }, []);
 
+  // Show toast only if geolocation was denied
+  useEffect(() => {
+    if (geolocationDenied) {
+      CustomToast({
+        message:
+          "Katsuio requires access to your current location to provide you with the complete experience. Please adjust your browser settings to allow Katsuio access to your location",
+      });
+    }
+  }, [geolocationDenied]);
   const Map = useMemo(
     () =>
       dynamic(() => import("../componenets/Map"), {
@@ -312,28 +314,28 @@ const Home: NextPage = () => {
 
   return (
     <PageLayout>
-      <main className="flex justify-center gap-4 bg-gray-100 p-4">
-        <div className="flex flex-col items-center">
-          <div>
-            <Image
-              src="/images/jantonalcor_snail.svg"
-              alt="Logo"
-              width={80}
-              height={300}
-              priority
-            />
-          </div>
-          <div>KatsuioAI</div>
-        </div>
-        {isSignedIn && <CreateRequestPostWizard />}
-
-        {isSignedIn && <UserButton afterSignOutUrl="/" />}
-        {!isSignedIn && (
-          <div className="flex justify-center">
-            <SignInButton className="focus:shadow-outline h-10 rounded-lg bg-purple-600 px-5 text-violet-200 transition-colors duration-150 hover:bg-gray-800" />
-          </div>
+      <div className="flex justify-center gap-4  p-4">
+        {isSignedIn ? (
+          <>
+            <div className="flex flex-col items-center">
+              <div>
+                <Image
+                  src="/images/jantonalcor_snail.svg"
+                  alt="Logo"
+                  width={80}
+                  height={300}
+                  priority
+                />
+              </div>
+              <div>KatsuioAI</div>
+            </div>
+            <CreateRequestPostWizard />
+            <UserButton afterSignOutUrl="/" />
+          </>
+        ) : (
+          <SignInPage />
         )}
-      </main>
+      </div>
     </PageLayout>
   );
 };

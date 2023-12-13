@@ -57,7 +57,7 @@ async function callChatGPTWithAssistance(input: string) {
         } catch (error) {
           reject(error);
         }
-      }, 65000);
+      }, 70000);
     });
 
     return conversation;
