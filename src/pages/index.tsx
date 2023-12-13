@@ -329,7 +329,7 @@ const Home: NextPage = () => {
                 <Image
                   src="/images/jantonalcor_snail.svg"
                   alt="Logo"
-                  width={40}
+                  width={80}
                   height={300}
                   priority
                 />
