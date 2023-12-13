@@ -317,7 +317,8 @@ const CreateResponsePostWizard = ({ userNameData }) => {
 const Home: NextPage = () => {
   const { isLoaded: userLoaded, isSignedIn } = useUser();
 
-  if (!userLoaded) return <div />;
+  // if (!userLoaded) return <div />;
+  console.log("homeeee");
 
   return (
     <PageLayout>
