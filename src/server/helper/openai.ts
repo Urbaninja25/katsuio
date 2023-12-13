@@ -95,7 +95,7 @@ async function callChatGPTWithFunctions(data: string) {
             userNames: {
               type: "string",
               decription:
-                "  host name or person name whom u will meet during these activity ",
+                "host name or person name whom u will meet during these activity ",
             },
           },
           required: ["userNames"],
