@@ -2,6 +2,7 @@ import { SignInButton } from "@clerk/nextjs";
 import Image from "next/image";
 
 export const SignInPage = () => {
+  console.log("signinpage!!!!");
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-700 px-6 py-12 lg:px-8">
       <div className="w-full text-center">
