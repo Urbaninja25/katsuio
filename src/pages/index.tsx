@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { useUser, UserButton } from "@clerk/nextjs";
+
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { type NextPage } from "next";
@@ -315,36 +315,24 @@ const CreateResponsePostWizard = ({ userNameData }) => {
 };
 
 const Home: NextPage = () => {
-  const { isLoaded: userLoaded, isSignedIn } = useUser();
-
-  if (!userLoaded) return <div />;
-
   return (
     <PageLayout>
-      <div className="flex  justify-center gap-4  p-4">
-        {isSignedIn ? (
-          <>
-            <div className="flex flex-col items-center">
-              <div>
-                <Image
-                  src="/images/jantonalcor_snail.svg"
-                  alt="Logo"
-                  width={80}
-                  height={300}
-                  priority
-                />
-              </div>
-              <p>KatsuioAI</p>
-            </div>
-            <CreateRequestPostWizard />
-            <UserButton afterSignOutUrl="/" />
-          </>
-        ) : (
-          <SignInPage />
-        )}
+      <div className="flex justify-center gap-4 p-4">
+        <div className="flex flex-col items-center">
+          <div>
+            <Image
+              src="/images/jantonalcor_snail.svg"
+              alt="Logo"
+              width={80}
+              height={300}
+              priority
+            />
+          </div>
+          <p>KatsuioAI</p>
+        </div>
+        <CreateRequestPostWizard />
       </div>
     </PageLayout>
   );
 };
-
 export default Home;
