@@ -10,7 +10,7 @@ import {
   callChatGPTWithFunctions,
   callChatGPTWithAssistance,
 } from "~/server/helper/openai";
-import { PageLayout } from "app/layout";
+import { PageLayout } from "~/componenets/layout";
 import dynamic from "next/dynamic";
 import toast from "react-hot-toast";
 import CustomToast from "~/componenets/toast";

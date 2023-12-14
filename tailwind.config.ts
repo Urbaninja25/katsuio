@@ -1,8 +1,8 @@
-import { type Config } from "tailwindcss";
-import { fontFamily } from "tailwindcss/defaultTheme";
+// tailwind.config.js
 import { nextui } from "@nextui-org/react";
 
-export default {
+/** @type {import('tailwindcss').Config} */
+const config = {
   content: [
     // ...
     "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
@@ -10,9 +10,8 @@ export default {
   theme: {
     extend: {},
   },
-  screens: {
-    tablet: "690px",
-  },
   darkMode: "class",
   plugins: [nextui()],
-} satisfies Config;
+};
+
+export default config;
