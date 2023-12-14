@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { useMemo, useState, useEffect } from "react";
 import { Button } from "@nextui-org/react";
