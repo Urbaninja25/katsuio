@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import { useMemo, useState, useEffect } from "react";
 import { Button } from "@nextui-org/react";
@@ -11,7 +10,7 @@ import {
   callChatGPTWithFunctions,
   callChatGPTWithAssistance,
 } from "~/server/helper/openai";
-import { PageLayout } from "~/componenets/layout";
+import { PageLayout } from "~/pages/app/layout";
 import dynamic from "next/dynamic";
 import toast from "react-hot-toast";
 import CustomToast from "~/componenets/toast";
