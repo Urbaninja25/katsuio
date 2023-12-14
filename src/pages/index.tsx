@@ -317,14 +317,32 @@ const CreateResponsePostWizard = ({ userNameData }) => {
 const Home: NextPage = () => {
   const { isLoaded: userLoaded, isSignedIn } = useUser();
 
-  if (!userLoaded) return <div>AEEEEEEEE</div>;
-  console.log("homeeee");
+  if (!userLoaded) return <div />;
 
   return (
     <PageLayout>
-      {!isSignedIn && <SignInPage />}
-      {isSignedIn && <CreateRequestPostWizard />}
-      {isSignedIn && <UserButton afterSignOutUrl="/" />}
+      <div className="flex  justify-center gap-4  p-4">
+        {isSignedIn ? (
+          <>
+            <div className="flex flex-col items-center">
+              <div>
+                <Image
+                  src="/images/jantonalcor_snail.svg"
+                  alt="Logo"
+                  width={80}
+                  height={300}
+                  priority
+                />
+              </div>
+              <p>KatsuioAI</p>
+            </div>
+            <CreateRequestPostWizard />
+            <UserButton afterSignOutUrl="/" />
+          </>
+        ) : (
+          <SignInPage />
+        )}
+      </div>
     </PageLayout>
   );
 };
