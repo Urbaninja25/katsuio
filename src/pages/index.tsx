@@ -1,5 +1,5 @@
+import React from "react";
 import { useMemo, useState, useEffect } from "react";
-
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { type NextPage } from "next";
@@ -278,7 +278,7 @@ const CreateResponsePostWizard = ({ userNameData }) => {
                   <div className="flex items-center">
                     <p className="flex-none text-xs">{item.hostUsername}</p>
                     <div className="w-2.5"></div>
-                    {/* <Button
+                    <Button
                       disabled
                       size="sm"
                       radius="full"
@@ -291,7 +291,7 @@ const CreateResponsePostWizard = ({ userNameData }) => {
                         parseFloat(item.location.split(",")[0]),
                         parseFloat(item.location.split(",")[1]),
                       ).toFixed(2) + " km"}
-                    </Button> */}
+                    </Button>
                   </div>
                 )
               }
