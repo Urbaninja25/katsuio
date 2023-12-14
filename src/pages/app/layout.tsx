@@ -16,3 +16,4 @@ export const PageLayout = (props: PropsWithChildren) => {
     </NextUIProvider>
   );
 };
+export default PageLayout;
