@@ -118,15 +118,15 @@ const CreateRequestPostWizard = () => {
         {input !== "" && (
           <div>
             <div>
-              <button
-                // isLoading={isLoading}
-                // size="sm"
-                // color="secondary"
-                // variant="shadow"
+              <Button
+                isLoading={isLoading}
+                size="sm"
+                color="secondary"
+                variant="shadow"
                 onClick={handleDataFetch}
               >
                 Post
-              </button>
+              </Button>
             </div>
             {isLoading && (
               <div>
