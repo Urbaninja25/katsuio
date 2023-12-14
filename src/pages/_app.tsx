@@ -2,7 +2,6 @@ import { type AppType } from "next/app";
 import { api } from "~/utils/api";
 import Head from "next/head";
 import "~/styles/globals.css";
-
 import { NextUIProvider } from "@nextui-org/react";
 import { Toaster } from "react-hot-toast";
 

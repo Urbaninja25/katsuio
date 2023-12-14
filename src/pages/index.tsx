@@ -17,7 +17,6 @@ import CustomToast from "~/componenets/toast";
 import { SkeletonComponent } from "~/componenets/Skeleton";
 import Image from "next/image";
 import { LoadingWithPercentage } from "~/componenets/LoadingSpinner";
-import { SignInPage } from "~/componenets/signInPage";
 
 const CreateRequestPostWizard = () => {
   const [input, setInput] = useState("");
@@ -119,15 +118,15 @@ const CreateRequestPostWizard = () => {
         {input !== "" && (
           <div>
             <div>
-              <Button
-                isLoading={isLoading}
-                size="sm"
-                color="secondary"
-                variant="shadow"
+              <button
+                // isLoading={isLoading}
+                // size="sm"
+                // color="secondary"
+                // variant="shadow"
                 onClick={handleDataFetch}
               >
                 Post
-              </Button>
+              </button>
             </div>
             {isLoading && (
               <div>
