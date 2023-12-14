@@ -23,7 +23,7 @@ const LoadingComponent = () => {
     if (showToast) {
       CustomToast({
         message:
-          "Apologies for the extended wait. Our servers are experiencing high traffic. We'll require an additional 15 seconds 🚀",
+          "Apologies for the extended wait. Our servers are experiencing high traffic. We'll require an additional 20 seconds 🚀",
       });
       setShowToast(false); // Reset flag after showing toast
     }

@@ -269,21 +269,21 @@ const CreateResponsePostWizard = ({ userNameData }) => {
   return (
     <div className="flex w-full flex-col">
       {!loadingLocation && (
-        <Tabs aria-label="Options" size={"sm"}>
+        <Tabs aria-label="Options" size="sm">
           {data.map((item, index) => (
             <Tab
               key={index}
               title={
-                <div className="flex items-center  ">
-                  <p className="flex-none text-xs">{item.hostUsername}</p>
-                  <div className="w-2.5"> </div>
-                  {userLocation && (
-                    <Button
-                      isDisabled
+                userLocation && (
+                  <div className="flex items-center">
+                    <p className="flex-none text-xs">{item.hostUsername}</p>
+                    <div className="w-2.5"></div>
+                    {/* <Button
+                      disabled
                       size="sm"
                       radius="full"
                       color="success"
-                      className=" flex-1"
+                      className="flex-1"
                     >
                       {calculateDistance(
                         userLocation[0],
@@ -291,9 +291,9 @@ const CreateResponsePostWizard = ({ userNameData }) => {
                         parseFloat(item.location.split(",")[0]),
                         parseFloat(item.location.split(",")[1]),
                       ).toFixed(2) + " km"}
-                    </Button>
-                  )}
-                </div>
+                    </Button> */}
+                  </div>
+                )
               }
             >
               <Card>
